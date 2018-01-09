@@ -24,7 +24,7 @@ public class User
     private RemotePublisher publisher;
     private IRemotePropertyListener listener;
 
-    public User(String username, String password) throws RemoteException
+    User(String username, String password) throws RemoteException
     {
         this.username = username;
         this.password = password;
@@ -40,12 +40,12 @@ public class User
         return username;
     }
 
-    public long getSessionId()
+    long getSessionId()
     {
         return sessionId;
     }
 
-    public List<String> getContacts()
+    List<String> getContacts()
     {
         List<String> contactNames = new ArrayList<>();
 
@@ -62,7 +62,7 @@ public class User
         return listener;
     }
 
-    public boolean login(String password, long newSessionId, IRemotePropertyListener listener) throws RemoteException
+    boolean login(String password, long newSessionId, IRemotePropertyListener listener) throws RemoteException
     {
         if (this.password.equals(password))
         {
@@ -82,7 +82,7 @@ public class User
         return false;
     }
 
-    public void logout() throws RemoteException
+    void logout() throws RemoteException
     {
         sessionId = -1;
 
@@ -92,12 +92,12 @@ public class User
         }
     }
 
-    public boolean addContact(User contact)
+    boolean addContact(User contact)
     {
         return !contacts.contains(contact) && contacts.add(contact);
     }
 
-    public void removeContact(String contactName)
+    void removeContact(String contactName)
     {
         try
         {
@@ -108,22 +108,22 @@ public class User
         { }
     }
 
-    public void newChat(String contactName) throws RemoteException, InvalidArgumentException
+    void newChat(String contactName) throws RemoteException, InvalidArgumentException
     {
         addToChat(new Chat(this, getContactByName(contactName)));
     }
 
-    public void sendMessage(long chatId, Message message) throws RemoteException, InvalidArgumentException
+    void sendMessage(long chatId, Message message) throws RemoteException, InvalidArgumentException
     {
         getChatById(chatId).sendMessage(message);
     }
 
-    public List<Message> getChatMessages(long chatId) throws InvalidArgumentException
+    List<Message> getChatMessages(long chatId) throws InvalidArgumentException
     {
         return getChatById(chatId).getMessages();
     }
 
-    public List<Long> getParticipatingChats()
+    List<Long> getParticipatingChats()
     {
         List<Long> chatIds = new ArrayList<>();
 
@@ -135,9 +135,16 @@ public class User
         return chatIds;
     }
 
-    public byte[] getFile(long chatId, String filename) throws InvalidArgumentException, FileNotFoundException, RemoteException
+    byte[] getFile(long chatId, String filename) throws InvalidArgumentException, FileNotFoundException, RemoteException
     {
         return getChatById(chatId).getFile(filename);
+    }
+
+    void addToChat(Chat chat) throws RemoteException
+    {
+        chats.add(chat);
+
+        publisher.inform(CHAT_LIST_UPDATER, null, chat.toString());
     }
 
     private User getContactByName(String contactName) throws InvalidArgumentException
@@ -153,12 +160,7 @@ public class User
         throw new InvalidArgumentException(new String[]{"Contact not found"});
     }
 
-    public void addToChat(Chat chat) throws RemoteException
-    {
-        chats.add(chat);
 
-        publisher.inform(CHAT_LIST_UPDATER, null, chat.toString());
-    }
 
     private Chat getChatById(long chatId) throws InvalidArgumentException
     {
