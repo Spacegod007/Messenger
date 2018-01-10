@@ -1,5 +1,9 @@
 package bootstrapper;
 
+import client.logic.Administration;
+import client.view.LoginScreen;
+import javafx.application.Application;
+
 class ClientProgram
 {
     private ClientProgram()
@@ -7,6 +11,6 @@ class ClientProgram
 
     public static void main(String[] args)
     {
-        //start client application
+        Application.launch(LoginScreen.class, args);
     }
 }

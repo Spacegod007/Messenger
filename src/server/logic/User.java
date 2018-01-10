@@ -33,6 +33,7 @@ public class User
         chats = new ArrayList<>();
 
         publisher = new RemotePublisher();
+        publisher.registerProperty(CHAT_LIST_UPDATER);
     }
 
     public String getUsername()

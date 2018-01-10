@@ -35,7 +35,7 @@ public class FileServerProgram
 
         try
         {
-            registry = LocateRegistry.getRegistry(PORT_NUMBER);
+            registry = LocateRegistry.createRegistry(PORT_NUMBER);
             System.out.printf("FileServer: registry created on port number %d%n", PORT_NUMBER);
         }
         catch (RemoteException e)

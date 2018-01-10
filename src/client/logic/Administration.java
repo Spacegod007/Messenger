@@ -8,15 +8,17 @@ import shared.fontyspublisher.IRemotePropertyListener;
 import java.beans.PropertyChangeEvent;
 import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-public class Administration implements IRemotePropertyListener
+public class Administration extends UnicastRemoteObject implements IRemotePropertyListener
 {
     private final IAdministration administration;
     private long sessionId;
 
-    public Administration()
+    public Administration() throws RemoteException
     {
+        super();
         ServerClient serverClient = new ServerClient();
         administration = serverClient.getAdministration();
     }
