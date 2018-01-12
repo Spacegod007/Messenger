@@ -1,7 +1,7 @@
 package server.logic;
 
+import bootstrapper.ServerProgram;
 import com.sun.javaws.exceptions.InvalidArgumentException;
-import shared.fontyspublisher.IRemotePropertyListener;
 import shared.Message;
 
 import java.io.FileNotFoundException;
@@ -13,15 +13,18 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class ServerAdministration extends UnicastRemoteObject implements IAdministration
 {
+    private final ServerProgram serverProgram;
     private AtomicLong nextSessionId;
     private List<User> users;
 
     private final transient Object synchronizer;
 
-    public ServerAdministration() throws RemoteException
+    public ServerAdministration(ServerProgram serverProgram) throws RemoteException
     {
         super();
-
+        
+        this.serverProgram = serverProgram;
+        
         this.users = new ArrayList<>();
         nextSessionId = new AtomicLong(1);
 
@@ -29,7 +32,7 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
     }
 
     @Override
-    public long login(String username, String password, IRemotePropertyListener listener) throws RemoteException
+    public long login(String username, String password) throws RemoteException
     {
         if (username == null || username.isEmpty())
         {
@@ -47,7 +50,7 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
         {
             try
             {
-                if (getUserByUsername(username).login(password, nextSessionId.get(), listener))
+                if (getUserByUsername(username).login(password, nextSessionId.get()))
                 {
                     returnable = nextSessionId.getAndIncrement();
                 }
@@ -71,7 +74,7 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
     }
 
     @Override
-    public long register(String username, String password, IRemotePropertyListener listener) throws RemoteException
+    public long register(String username, String password) throws RemoteException
     {
         if (username == null || username.isEmpty())
         {
@@ -93,10 +96,10 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
             catch (InvalidArgumentException ignored)
             { }
 
-            users.add(new User(username, password));
+            users.add(new User(username, password, serverProgram));
         }
 
-        return login(username, password, listener);
+        return login(username, password);
     }
 
     @Override
@@ -139,6 +142,12 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
     public List<Long> getParticipatingChats(long sessionId) throws InvalidArgumentException
     {
         return getUserBySessionId(sessionId).getParticipatingChats();
+    }
+
+    @Override
+    public String getChatName(long sessionId, long chatId) throws RemoteException, InvalidArgumentException
+    {
+        return getUserBySessionId(sessionId).getChatName(chatId);
     }
 
     @Override

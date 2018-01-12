@@ -2,6 +2,7 @@ package bootstrapper;
 
 import server.logic.ServerAdministration;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -23,7 +24,7 @@ public class ServerProgram
 
         try
         {
-            serverAdministration = new ServerAdministration();
+            serverAdministration = new ServerAdministration(this);
             System.out.println("Server: server administration created");
         }
         catch (RemoteException e)
@@ -44,15 +45,18 @@ public class ServerProgram
             e.printStackTrace();
         }
 
+        registerProperty(BINDING_NAME, serverAdministration);
+    }
+
+    public void registerProperty(String name, Remote remote)
+    {
         try
         {
-            registry.rebind(BINDING_NAME, serverAdministration);
+            registry.rebind(name, remote);
         }
         catch (RemoteException e)
         {
-            System.out.println("Server: cannot bind server administration to registry");
             e.printStackTrace();
-            System.exit(-1);
         }
     }
 }

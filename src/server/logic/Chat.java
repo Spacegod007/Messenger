@@ -15,10 +15,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class Chat implements Serializable, IRemotePublisherForListener
+public class Chat
 {
-    private final RemotePublisher publisher;
-    public static final String MESSAGES_PROPERTY_NAME = "MESSAGES";
+    public static final String MESSAGES_PROPERTY_NAME = "Messages";
+    public static final String PARTICIPANTS_CHECKER = "Participants";
 
     private static final AtomicLong nextChatId = new AtomicLong(0);
 
@@ -45,12 +45,6 @@ public class Chat implements Serializable, IRemotePublisherForListener
 
         other.addToChat(this);
 
-        publisher = new RemotePublisher();
-        publisher.registerProperty(MESSAGES_PROPERTY_NAME);
-
-        subscribeRemoteListener(self.getListener(), MESSAGES_PROPERTY_NAME);
-        subscribeRemoteListener(other.getListener(), MESSAGES_PROPERTY_NAME);
-
         fileStorage = new FileServerClient().getFileStorage();
     }
 
@@ -62,8 +56,6 @@ public class Chat implements Serializable, IRemotePublisherForListener
         }
 
         messages.add(message);
-
-        publisher.inform(MESSAGES_PROPERTY_NAME, null, messages);
     }
 
     public byte[] getFile(String filename) throws FileNotFoundException, RemoteException
@@ -87,18 +79,6 @@ public class Chat implements Serializable, IRemotePublisherForListener
     }
 
     @Override
-    public void subscribeRemoteListener(IRemotePropertyListener listener, String property) throws RemoteException
-    {
-        publisher.subscribeRemoteListener(listener, property);
-    }
-
-    @Override
-    public void unsubscribeRemoteListener(IRemotePropertyListener listener, String property) throws RemoteException
-    {
-        publisher.unsubscribeRemoteListener(listener, property);
-    }
-
-    @Override
     public String toString()
     {
         StringBuilder returnable = new StringBuilder(String.valueOf(chatId));
@@ -106,6 +86,28 @@ public class Chat implements Serializable, IRemotePublisherForListener
         for (User user : participants)
         {
             returnable.append(user.toString());
+        }
+
+        return returnable.toString();
+    }
+
+    public String getChatName(String username)
+    {
+        StringBuilder returnable = new StringBuilder();
+
+        for (User participant : participants)
+        {
+            if (!participant.getUsername().equals(username))
+            {
+                if (returnable.length() == 0)
+                {
+                    returnable = new StringBuilder(participant.getUsername());
+                }
+                else
+                {
+                    returnable.append(", ").append(participant.getUsername());
+                }
+            }
         }
 
         return returnable.toString();

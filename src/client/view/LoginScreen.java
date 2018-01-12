@@ -1,8 +1,8 @@
 package client.view;
 
 import client.logic.Administration;
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -17,7 +17,7 @@ public class LoginScreen extends Application
 {
     private Administration administration;
 
-    private Stage stage;
+    private Stage primaryStage;
     private GridPane gridPane;
 
     private Label usernameText;
@@ -42,23 +42,20 @@ public class LoginScreen extends Application
     @Override
     public void start(Stage primaryStage) throws Exception
     {
-        this.stage = primaryStage;
+        this.primaryStage = primaryStage;
 
         Group root = new Group();
 
-        innitializeViewObjects();
+        initializeViewObjects();
 
         root.getChildren().addAll(gridPane);
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 
-    private void innitializeViewObjects()
+    private void initializeViewObjects()
     {
-        gridPane = new GridPane();
-        gridPane.setVgap(5);
-        gridPane.setHgap(10);
-        gridPane.setPadding(new Insets(5));
+        gridPane = ViewToolbox.buildStandardGridPane();
 
         usernameText = new Label("Username");
 
@@ -69,28 +66,11 @@ public class LoginScreen extends Application
         passwordField = new TextField();
 
         registerButton = new Button("Register");
-        registerButton.setOnAction(event ->
-        {
-            String username = usernameField.getText();
-            String password = passwordField.getText();
-
-            if (administration.register(username, password))
-            {
-                //todo open main screen
-            }
-        });
+        registerButton.setOnAction(event -> register()
+        );
 
         loginButton = new Button("Login");
-        loginButton.setOnAction(event ->
-        {
-            String username = usernameField.getText();
-            String password = passwordField.getText();
-
-            if (administration.login(username, password))
-            {
-                //todo open main screen
-            }
-        });
+        loginButton.setOnAction(event -> login());
 
         gridPane.add(usernameText, 0, 0);
         gridPane.add(usernameField, 1, 0);
@@ -98,5 +78,46 @@ public class LoginScreen extends Application
         gridPane.add(passwordField, 1, 1);
         gridPane.add(registerButton, 0, 2);
         gridPane.add(loginButton, 1, 2);
+    }
+
+    private void login()
+    {
+        String username = usernameField.getText();
+        String password = passwordField.getText();
+
+        if (administration.login(username, password))
+        {
+            new MainScreen(primaryStage, administration);
+        }
+        else
+        {
+
+        }
+
+        resetTextFields();
+    }
+
+    private void register()
+    {
+        String username = usernameField.getText();
+        String password = passwordField.getText();
+
+        try
+        {
+            if (administration.register(username, password))
+            {
+                new MainScreen(primaryStage, administration);
+            }
+        }
+        catch (InvalidArgumentException ignored)
+        { }
+
+        resetTextFields();
+    }
+
+    private void resetTextFields()
+    {
+        usernameField.setText(null);
+        passwordField.setText(null);
     }
 }
