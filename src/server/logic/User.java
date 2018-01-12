@@ -1,6 +1,6 @@
 package server.logic;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
+import exceptions.InvalidArgumentException;
 import shared.fontyspublisher.IRemotePropertyListener;
 import shared.fontyspublisher.RemotePublisher;
 import shared.Message;
@@ -150,7 +150,7 @@ public class User
             }
         }
 
-        throw new InvalidArgumentException(new String[]{"Contact not found"});
+        throw new InvalidArgumentException("Contact not found");
     }
 
     public void addToChat(Chat chat) throws RemoteException
@@ -170,6 +170,6 @@ public class User
             }
         }
 
-        throw new InvalidArgumentException(new String[]{"Chat not found"});
+        throw new InvalidArgumentException("Chat not found");
     }
 }

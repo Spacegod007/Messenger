@@ -1,6 +1,6 @@
 package server.logic;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
+import exceptions.InvalidArgumentException;
 import shared.fontyspublisher.IRemotePropertyListener;
 import shared.Message;
 
