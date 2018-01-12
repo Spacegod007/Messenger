@@ -1,7 +1,8 @@
 package server.logic;
 
+import exceptions.InvalidArgumentException;
+import shared.fontyspublisher.IRemotePropertyListener;
 import bootstrapper.ServerProgram;
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import shared.Message;
 
 import java.io.FileNotFoundException;
@@ -22,9 +23,9 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
     public ServerAdministration(ServerProgram serverProgram) throws RemoteException
     {
         super();
-        
+
         this.serverProgram = serverProgram;
-        
+
         this.users = new ArrayList<>();
         nextSessionId = new AtomicLong(1);
 
@@ -193,7 +194,7 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
             }
         }
 
-        throw new InvalidArgumentException(new String[]{"User session not found"});
+        throw new InvalidArgumentException("User session not found");
     }
 
     private User getUserByUsername(String username) throws InvalidArgumentException
@@ -209,6 +210,6 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
             }
         }
 
-        throw new InvalidArgumentException(new String[]{String.format("User by the name of %s not found", username)});
+        throw new InvalidArgumentException(String.format("User by the name of %s not found", username));
     }
 }

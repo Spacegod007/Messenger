@@ -1,7 +1,9 @@
 package server.logic;
 
+import exceptions.InvalidArgumentException;
+import shared.fontyspublisher.IRemotePropertyListener;
+import shared.fontyspublisher.RemotePublisher;
 import bootstrapper.ServerProgram;
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import shared.Message;
 import shared.fontyspublisher.IRemotePublisherForDomain;
 import shared.fontyspublisher.RemotePublisher;
@@ -156,7 +158,7 @@ public class User implements IRemotePublisherForDomain
             }
         }
 
-        throw new InvalidArgumentException(new String[]{"Contact not found"});
+        throw new InvalidArgumentException("Contact not found");
     }
 
     private Chat getChatById(long chatId) throws InvalidArgumentException
@@ -169,7 +171,7 @@ public class User implements IRemotePublisherForDomain
             }
         }
 
-        throw new InvalidArgumentException(new String[]{"Chat not found"});
+        throw new InvalidArgumentException("Chat not found");
     }
 
     public String getChatName(long chatId) throws InvalidArgumentException

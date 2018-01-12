@@ -1,6 +1,7 @@
 package client.logic;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
+import exceptions.InvalidArgumentException;
+
 import server.logic.Chat;
 import server.logic.IAdministration;
 import server.logic.User;
