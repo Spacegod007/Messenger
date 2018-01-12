@@ -1,7 +1,7 @@
 package client.view;
 
 import client.logic.Administration;
-import com.sun.javaws.exceptions.InvalidArgumentException;
+import exceptions.InvalidArgumentException;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -109,7 +109,7 @@ public class LoginScreen extends Application
                 new MainScreen(primaryStage, administration);
             }
         }
-        catch (InvalidArgumentException ignored)
+        catch (InvalidArgumentException | IllegalArgumentException ignored)
         { }
 
         resetTextFields();
