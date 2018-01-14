@@ -5,21 +5,42 @@ import exceptions.InvalidArgumentException;
 import shared.Message;
 import shared.SerializableChat;
 
-import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Main communication entry point of the server application
+ */
 public class ServerAdministration extends UnicastRemoteObject implements IAdministration
 {
+    /**
+     * The class which created this class, passes connection data
+     */
     private final ServerProgram serverProgram;
+
+    /**
+     * The next available session id
+     */
     private AtomicLong nextSessionId;
+
+    /**
+     * ALl users that are currently registered on the server
+     */
     private List<User> users;
 
+    /**
+     * A synchronizer object to prevent data from being accessed at the same time in multiple locations
+     */
     private final Object synchronizer;
 
+    /**
+     * The constructor of the server administration
+     * @param serverProgram which initiated this class
+     * @throws RemoteException if something goes wrong in setting up the connections
+     */
     public ServerAdministration(ServerProgram serverProgram) throws RemoteException
     {
         super();
@@ -76,6 +97,9 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
         return returnable;
     }
 
+    /**
+     * Checks if the maximum session id is closing in
+     */
     private void checkMaxSessionId()
     {
         if (nextSessionId.get() == Long.MAX_VALUE - 1)
@@ -154,13 +178,12 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
         return getUserBySessionId(sessionId).getContacts();
     }
 
-    @Override
-    public byte[] getFile(long sessionId, long chatId, String filename) throws InvalidArgumentException, FileNotFoundException, RemoteException
-    {
-        return getUserBySessionId(sessionId).getFile(chatId, filename);
-    }
-
-    public boolean isExistingUser(String username)
+    /**
+     * Checks if an user by the specified name exists
+     * @param username of the user
+     * @return true if the user exists, false if it does not exist
+     */
+    private boolean isExistingUser(String username)
     {
         try
         {
@@ -173,6 +196,12 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
         }
     }
 
+    /**
+     * Gets a specified user object by session id
+     * @param sessionId of the user
+     * @return the user which is linked to this session id
+     * @throws InvalidArgumentException if user session was not found
+     */
     private User getUserBySessionId(long sessionId) throws InvalidArgumentException
     {
         if (sessionId == -1 || sessionId == 0)
@@ -194,6 +223,12 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
         throw new InvalidArgumentException("User session not found");
     }
 
+    /**
+     * Gets an user object by username
+     * @param username of the user
+     * @return the user who owns this username
+     * @throws InvalidArgumentException if no user has the specified username
+     */
     private User getUserByUsername(String username) throws InvalidArgumentException
     {
         synchronized (synchronizer)

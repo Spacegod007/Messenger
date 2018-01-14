@@ -3,22 +3,45 @@ package shared;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 
+/**
+ * Message with byte[] type implementation used to transfer files
+ */
 public class FileMessage extends Message<byte[]> implements Serializable
 {
+    /**
+     * name of the file
+     */
     private final String filename;
 
+    /**
+     * constructor of the file message object
+     * @param contents of the file
+     * @param filename of the file
+     * @param author of the message
+     */
     public FileMessage(byte[] contents, String filename, String author)
     {
         super(contents, author);
         this.filename = filename;
     }
 
+    /**
+     * constructor of the file message object which manually selects the date of creation
+     * @param timestamp when the message was created
+     * @param contents of the file
+     * @param filename of the file
+     * @param author of the message
+     */
     public FileMessage(OffsetDateTime timestamp, byte[] contents, String filename, String author)
     {
         super(timestamp, contents, author);
         this.filename = filename;
     }
 
+    /**
+     * gets the name of the file
+     * @return a string object containing the filename
+     */
     public String getFilename()
     {
         return filename;
@@ -27,7 +50,6 @@ public class FileMessage extends Message<byte[]> implements Serializable
     @Override
     public String toString()
     {
-        return getAuthor() + " " + getTimestamp().toLocalDateTime().toString() + String.format("%n") +
-                "Send: " + filename;
+        return "(" + getTimestamp().getHour() + ":" + getTimestamp().getMinute() + ") " + getAuthor() + String.format(": %n") + filename;
     }
 }

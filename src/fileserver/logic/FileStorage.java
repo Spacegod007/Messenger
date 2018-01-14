@@ -9,12 +9,25 @@ import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+/**
+ * The filestorage part of the system
+ */
 public class FileStorage extends UnicastRemoteObject implements IFileStorage
 {
+    /**
+     * The prefix of the stored files location
+     */
     private static final String PATH_PREFIX = "StoredFiles\\";
 
+    /**
+     * A synchronizer object used to only allow the reading/writing of one file at a time
+     */
     private final Object synchronizer;
 
+    /**
+     * The constructor of the filestorage object
+     * @throws RemoteException
+     */
     public FileStorage() throws RemoteException
     {
         super();
@@ -22,6 +35,12 @@ public class FileStorage extends UnicastRemoteObject implements IFileStorage
         synchronizer = new Object();
     }
 
+    /**
+     * Gets a file of the server
+     * @param filename of the file
+     * @return a byte array containing the data of a file
+     * @throws FileNotFoundException if the file was not found
+     */
     @Override
     public byte[] getFile(String filename) throws FileNotFoundException
     {
@@ -44,6 +63,11 @@ public class FileStorage extends UnicastRemoteObject implements IFileStorage
         return null;
     }
 
+    /**
+     * Stores data on the server
+     * @param filename of the file to be stored
+     * @param data of the file
+     */
     @Override
     public void storeData(String filename, byte[] data)
     {
@@ -53,17 +77,29 @@ public class FileStorage extends UnicastRemoteObject implements IFileStorage
         }
     }
 
+    /**
+     * reads all data of a specified file
+     * @param file to be read
+     * @return a byte array containing the data of the file
+     * @throws IOException if something goes wrong while reading the file
+     */
     private byte[] readAllData(File file) throws IOException
     {
         return Files.readAllBytes(Paths.get(file.toURI()));
     }
 
+    /**
+     * Writes all data of the specified file
+     * @param file where the data needs to be written
+     * @param data to be written
+     */
     private void writeAllData(File file, byte[] data)
     {
+        file.getParentFile().mkdirs();
+
         try (FileOutputStream fileOutputStream = new FileOutputStream(file, false))
         {
             //noinspection ResultOfMethodCallIgnored
-            file.getParentFile().mkdirs();
             fileOutputStream.write(data);
         }
         catch (IOException e)

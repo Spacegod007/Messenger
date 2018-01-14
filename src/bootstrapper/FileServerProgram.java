@@ -6,17 +6,38 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+/**
+ * Main entry point of the file server application
+ */
 public class FileServerProgram
 {
+    /**
+     * Registry located on the fileserver
+     */
     private Registry registry;
+
+    /**
+     * The bindingname of to obtain the file storage object
+     */
     public static final String BINDING_NAME = "FileServer";
+
+    /**
+     * port used to connect to the file storage
+     */
     public static final int PORT_NUMBER = 2501;
 
+    /**
+     * main entry point of the file server program
+     * @param args not used
+     */
     public static void main(String[] args)
     {
         new FileServerProgram();
     }
 
+    /**
+     * the constructor of the file server
+     */
     private FileServerProgram()
     {
         FileStorage fileStorage;

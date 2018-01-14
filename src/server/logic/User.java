@@ -12,21 +12,63 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A user of the application
+ */
 public class User implements IRemotePublisherForDomain
 {
+    /**
+     * constant used to inform the user client of changes with the chat list
+     */
     public static final String CHAT_LIST_UPDATER = "chatListUpdater";
+
+    /**
+     * constant used to inform the user client of changes with the registry
+     */
     public static final String REGISTRY_UPDATER = "registryUpdater";
+
+    /**
+     * constant used to inform the user client of changes with the contact list
+     */
     public static final String CONTACT_LIST_UPDATER = "contactListUpdater";
 
+    /**
+     * the username of the user
+     */
     private final String username;
+
+    /**
+     * the password of the user
+     */
     private final String password;
+
+    /**
+     * the session id of the user
+     */
     private long sessionId;
 
+    /**
+     * the contacts of the user
+     */
     private final List<User> contacts;
+
+    /**
+     * the chats the user participates in
+     */
     private final List<Chat> chats;
 
+    /**
+     * a publisher which informs the client-side of changes on the server
+     */
     private RemotePublisher publisher;
 
+    /**
+     * The constructor of the user
+     * @param username of the user
+     * @param password of the user
+     * @param serverProgram which is used to register the publisher
+     * @throws RemoteException if something goes wrong in the creation of the publisher
+     */
     User(String username, String password, ServerProgram serverProgram) throws RemoteException
     {
         this.username = username;
@@ -43,16 +85,28 @@ public class User implements IRemotePublisherForDomain
         serverProgram.registerProperty(username, publisher);
     }
 
+    /**
+     * gets the username of the user
+     * @return a string containing the username
+     */
     public String getUsername()
     {
         return username;
     }
 
+    /**
+     * gets the session id of the user
+     * @return a long variable containing the session of the user
+     */
     long getSessionId()
     {
         return sessionId;
     }
 
+    /**
+     * Gets the contacts of the user
+     * @return a list of contacts
+     */
     List<String> getContacts()
     {
         List<String> contactNames = new ArrayList<>();
@@ -65,6 +119,12 @@ public class User implements IRemotePublisherForDomain
         return contactNames;
     }
 
+    /**
+     * logs the user into the system
+     * @param password of the user (must be equal to the local password variable)
+     * @param newSessionId the new session id allocated if the password is correct
+     * @return true if the password is correct otherwise false
+     */
     boolean login(String password, long newSessionId)
     {
         if (this.password.equals(password))
@@ -76,11 +136,20 @@ public class User implements IRemotePublisherForDomain
         return false;
     }
 
+    /**
+     * logs the user out of the system
+     */
     void logout()
     {
         sessionId = -1;
     }
 
+    /**
+     * adds the specified contact to the user
+     * @param contact to be added (if he/she isn't already a contact)
+     * @return true if the user is added as a contact otherwise false
+     * @throws RemoteException if something goes wrong in informing the clients
+     */
     boolean addContact(User contact) throws RemoteException
     {
         if (!username.equals(contact.username))
@@ -98,6 +167,10 @@ public class User implements IRemotePublisherForDomain
         return false;
     }
 
+    /**
+     * removes a contact of the user
+     * @param contactName of the contact to be removed
+     */
     void removeContact(String contactName)
     {
         try
@@ -109,16 +182,33 @@ public class User implements IRemotePublisherForDomain
         { }
     }
 
+    /**
+     * creates a new chat for the user
+     * @param contactName of the contact to be invited to the chat
+     * @throws RemoteException if something goes wrong in the creation of the chat
+     * @throws InvalidArgumentException if the contact does not exist in the contactlist
+     */
     void newChat(String contactName) throws RemoteException, InvalidArgumentException
     {
         new Chat(this, getContactByName(contactName));
     }
 
+    /**
+     * sends a message in the specified chat
+     * @param chatId of the chat where the message needs to get send to
+     * @param message which is about to be send
+     * @throws RemoteException if something goes wrong in informing all clients of the change in the chat
+     * @throws InvalidArgumentException if the chat with the specified id does not exist
+     */
     void sendMessage(long chatId, Message message) throws RemoteException, InvalidArgumentException
     {
         getChatById(chatId).sendMessage(message);
     }
 
+    /**
+     * Gets all chats the user participates in
+     * @return a list of serializable (sendable) chats
+     */
     List<SerializableChat> getParticipatingChats()
     {
         List<SerializableChat> returnable = new ArrayList<>();
@@ -131,11 +221,11 @@ public class User implements IRemotePublisherForDomain
         return returnable;
     }
 
-    byte[] getFile(long chatId, String filename) throws InvalidArgumentException, FileNotFoundException, RemoteException
-    {
-        return getChatById(chatId).getFile(filename);
-    }
-
+    /**
+     * Adds the current user to the specified chat
+     * @param chat to be added to
+     * @throws RemoteException if something goes wrong in informing the clients of the change
+     */
     void addToChat(Chat chat) throws RemoteException
     {
         chats.add(chat);
@@ -147,6 +237,12 @@ public class User implements IRemotePublisherForDomain
         inform(CHAT_LIST_UPDATER, null, getParticipatingChats());
     }
 
+    /**
+     * Gets the specified user by the contactname
+     * @param contactName of the user
+     * @return the user who own the contactname
+     * @throws InvalidArgumentException if the user was not found
+     */
     private User getContactByName(String contactName) throws InvalidArgumentException
     {
         for (User contact : contacts)
@@ -160,6 +256,12 @@ public class User implements IRemotePublisherForDomain
         throw new InvalidArgumentException("Contact not found");
     }
 
+    /**
+     * Gets the chat by the specified id
+     * @param chatId of the chat
+     * @return the chat which has the specified id
+     * @throws InvalidArgumentException if no chat the user participates in has the specified id
+     */
     private Chat getChatById(long chatId) throws InvalidArgumentException
     {
         for (Chat chat : chats)

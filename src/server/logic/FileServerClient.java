@@ -8,11 +8,24 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+/**
+ * Server to fileserver connector class
+ */
 class FileServerClient
 {
+    /**
+     * The filestorage object where objects can be stored
+     */
     private IFileStorage fileStorage;
+
+    /**
+     * The registry located on the filestorage
+     */
     private Registry registry;
 
+    /**
+     * Constructor of the connector class
+     */
     FileServerClient()
     {
         try
@@ -40,6 +53,10 @@ class FileServerClient
         }
     }
 
+    /**
+     * gets the filestorage object
+     * @return a filestorage object
+     */
     public IFileStorage getFileStorage()
     {
         return fileStorage;

@@ -7,11 +7,18 @@ import javafx.collections.MapChangeListener;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import shared.FileMessage;
 import shared.Message;
 import shared.SerializableChat;
+
+import java.io.File;
+import java.io.IOException;
 
 public class ChatScreen
 {
@@ -45,15 +52,19 @@ public class ChatScreen
         GridPane gridPane = ViewToolbox.buildStandardGridPane();
 
         messageListView = new ListView<>();
+        messageListView.setOnMouseClicked(this::messageListViewClicked);
 
         participants = new ListView<>();
 
         messageField = new TextField();
 
+        messageField.setOnKeyReleased(this::keyPressed);
+
         sendMessage = new Button("Send");
-        sendMessage.setOnMouseClicked(this::sendMessage);
+        sendMessage.setOnMouseClicked(mouseEvent -> sendMessage());
 
         sendFile = new Button("File");
+        sendFile.setOnMouseClicked(mouseEvent -> sendFile());
 
         refreshContents();
 
@@ -67,7 +78,52 @@ public class ChatScreen
         privateStage.show();
     }
 
-    private void sendMessage(MouseEvent mouseEvent)
+    private void messageListViewClicked(MouseEvent mouseEvent)
+    {
+        Message selectedItem = messageListView.getSelectionModel().getSelectedItem();
+        if (selectedItem != null && selectedItem instanceof FileMessage)
+        {
+            FileMessage fileMessage = (FileMessage) selectedItem;
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save " + fileMessage.getFilename());
+            fileChooser.setInitialFileName(fileMessage.getFilename());
+            File file = fileChooser.showSaveDialog(new Stage());
+
+            if (file != null)
+            {
+                try
+                {
+                    administration.getFile(fileMessage, file);
+                }
+                catch (IOException e)
+                {
+                    new ErrorScreen(privateStage, String.format("Whoops, something went wrong while saving the file.%nFeel free to try again later."));
+                }
+            }
+        }
+    }
+
+    private void sendFile()
+    {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("File to send");
+        File file = fileChooser.showOpenDialog(new Stage());
+
+        if (file != null)
+        {
+            administration.sendFile(chatName, file);
+        }
+    }
+
+    private void keyPressed(KeyEvent keyEvent)
+    {
+        if (keyEvent.getCode() == KeyCode.ENTER && !keyEvent.isShiftDown() && !keyEvent.isControlDown() && !keyEvent.isAltDown() && !keyEvent.isMetaDown() && !keyEvent.isShortcutDown())
+        {
+            sendMessage();
+        }
+    }
+
+    private void sendMessage()
     {
         String message = messageField.getText();
 

@@ -11,11 +11,26 @@ import java.rmi.registry.Registry;
 
 class ServerClient
 {
+    /**
+     * ip address of the server
+     */
     final String ipAddress = "localhost";
+    /**
+     * The administration object which was received from the server
+     */
     private IAdministration administration;
+    /**
+     * The publisher of the logged in client
+     */
     private IRemotePublisherForListener clientPublisher;
+    /**
+     * The registry which is located on the server
+     */
     private Registry registry;
 
+    /**
+     * The constructor of the connection initiator class
+     */
     ServerClient()
     {
         try
@@ -41,11 +56,20 @@ class ServerClient
         }
     }
 
+    /**
+     * Gets the administration object of the client
+     * @return the administration object
+     */
     public IAdministration getAdministration()
     {
         return administration;
     }
 
+    /**
+     * Gets the publisher object of the server
+     * @param username of the logged in user
+     * @return a publisher object
+     */
     public IRemotePublisherForListener getPublisher(String username)
     {
         if (clientPublisher == null)
