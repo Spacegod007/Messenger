@@ -120,6 +120,7 @@ class ChatScreen
         if (keyEvent.getCode() == KeyCode.ENTER && !keyEvent.isShiftDown() && !keyEvent.isControlDown() && !keyEvent.isAltDown() && !keyEvent.isMetaDown() && !keyEvent.isShortcutDown())
         {
             sendMessage();
+            messageField.setText("");
         }
     }
 
