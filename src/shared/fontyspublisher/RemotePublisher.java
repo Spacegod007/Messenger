@@ -18,7 +18,7 @@ public class RemotePublisher extends UnicastRemoteObject
     implements IRemotePublisherForListener, IRemotePublisherForDomain {
 
     // Local publisher
-    final Publisher publisher;
+    private final Publisher publisher;
     
     /**
      * Default no-arg constructor for RemotePublisher.
@@ -66,11 +66,11 @@ public class RemotePublisher extends UnicastRemoteObject
     }
     
     /**
-     * Unsubscribe local property listener. Listener will be unsubscribed from 
+     * Unsubscribe local property listener. Listener will be unsubscribe from
      * given property. In case given property is the null-string, the listener 
-     * will be unsubscribed from all properties.
+     * will unsubscribe from all properties.
      *
-     * @param listener property listener to be unsubscribed
+     * @param listener property listener to unsubscribe
      * @param property null-String allowed
      */
     public void unsubscribeLocalListener(ILocalPropertyListener listener, String property) {

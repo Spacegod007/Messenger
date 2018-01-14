@@ -20,13 +20,13 @@ import shared.SerializableChat;
 import java.io.File;
 import java.io.IOException;
 
-public class ChatScreen
+class ChatScreen
 {
     private final Stage privateStage;
     private final Administration administration;
 
     private SerializableChat chat;
-    private String chatName;
+    private final String chatName;
 
     private ListView<Message> messageListView;
     private ListView<String> participants;

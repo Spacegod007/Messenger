@@ -10,7 +10,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 /**
- * The filestorage part of the system
+ * The file storage part of the system
  */
 public class FileStorage extends UnicastRemoteObject implements IFileStorage
 {
@@ -25,8 +25,8 @@ public class FileStorage extends UnicastRemoteObject implements IFileStorage
     private final Object synchronizer;
 
     /**
-     * The constructor of the filestorage object
-     * @throws RemoteException
+     * The constructor of the file storage object
+     * @throws RemoteException if something goes wrong while initiating the server-side of the connection
      */
     public FileStorage() throws RemoteException
     {
@@ -95,11 +95,11 @@ public class FileStorage extends UnicastRemoteObject implements IFileStorage
      */
     private void writeAllData(File file, byte[] data)
     {
+        //noinspection ResultOfMethodCallIgnored
         file.getParentFile().mkdirs();
 
         try (FileOutputStream fileOutputStream = new FileOutputStream(file, false))
         {
-            //noinspection ResultOfMethodCallIgnored
             fileOutputStream.write(data);
         }
         catch (IOException e)

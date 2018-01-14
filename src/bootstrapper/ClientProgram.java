@@ -16,7 +16,7 @@ class ClientProgram
 
     /**
      * Main entry point of the client application
-     * @param args
+     * @param args not used
      */
     public static void main(String[] args)
     {

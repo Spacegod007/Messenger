@@ -9,17 +9,17 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 /**
- * Server to fileserver connector class
+ * Server to file server connector class
  */
 class FileServerClient
 {
     /**
-     * The filestorage object where objects can be stored
+     * The file storage object where objects can be stored
      */
     private IFileStorage fileStorage;
 
     /**
-     * The registry located on the filestorage
+     * The registry located on the file storage
      */
     private Registry registry;
 
@@ -54,8 +54,8 @@ class FileServerClient
     }
 
     /**
-     * gets the filestorage object
-     * @return a filestorage object
+     * gets the file storage object
+     * @return a file storage object
      */
     public IFileStorage getFileStorage()
     {

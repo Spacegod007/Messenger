@@ -14,7 +14,7 @@ class ServerClient
     /**
      * ip address of the server
      */
-    final String ipAddress = "localhost";
+    private final String ipAddress = "localhost";
     /**
      * The administration object which was received from the server
      */

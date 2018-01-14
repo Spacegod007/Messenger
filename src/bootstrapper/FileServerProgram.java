@@ -12,12 +12,12 @@ import java.rmi.registry.Registry;
 public class FileServerProgram
 {
     /**
-     * Registry located on the fileserver
+     * Registry located on the files erver
      */
     private Registry registry;
 
     /**
-     * The bindingname of to obtain the file storage object
+     * The binding name of to obtain the file storage object
      */
     public static final String BINDING_NAME = "FileServer";
 

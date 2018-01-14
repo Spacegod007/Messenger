@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 
 import java.rmi.RemoteException;
 
-public class AddContactScreen
+class AddContactScreen
 {
     private final Administration administration;
 
@@ -68,10 +68,10 @@ public class AddContactScreen
 
     private void addContact(ActionEvent event)
     {
-        String contactname = contactName.getText();
+        String contactName = this.contactName.getText();
         try
         {
-            if (administration.addContact(contactname))
+            if (administration.addContact(contactName))
             {
                 resultText.setText("Contact added");
                 resultText.setTextFill(Color.BLACK);

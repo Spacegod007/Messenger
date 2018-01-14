@@ -7,7 +7,6 @@ import bootstrapper.ServerProgram;
 import shared.Message;
 import shared.fontyspublisher.IRemotePublisherForDomain;
 
-import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -186,7 +185,7 @@ public class User implements IRemotePublisherForDomain
      * creates a new chat for the user
      * @param contactName of the contact to be invited to the chat
      * @throws RemoteException if something goes wrong in the creation of the chat
-     * @throws InvalidArgumentException if the contact does not exist in the contactlist
+     * @throws InvalidArgumentException if the contact does not exist in the contact list
      */
     void newChat(String contactName) throws RemoteException, InvalidArgumentException
     {
@@ -207,7 +206,7 @@ public class User implements IRemotePublisherForDomain
 
     /**
      * Gets all chats the user participates in
-     * @return a list of serializable (sendable) chats
+     * @return a list of serializable (send able) chats
      */
     List<SerializableChat> getParticipatingChats()
     {
@@ -238,9 +237,9 @@ public class User implements IRemotePublisherForDomain
     }
 
     /**
-     * Gets the specified user by the contactname
+     * Gets the specified user by the contact name
      * @param contactName of the user
-     * @return the user who own the contactname
+     * @return the user who own the contact name
      * @throws InvalidArgumentException if the user was not found
      */
     private User getContactByName(String contactName) throws InvalidArgumentException

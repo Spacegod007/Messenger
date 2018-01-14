@@ -4,7 +4,6 @@ import exceptions.InvalidArgumentException;
 import shared.SerializableChat;
 import shared.Message;
 
-import java.io.FileNotFoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -71,7 +70,7 @@ public interface IAdministration extends Remote
     /**
      * Creates a new chat for the logged in user and the specified contact
      * @param sessionId of the logged in user
-     * @param contact to be added to the chat, must already be in contactlist
+     * @param contact to be added to the chat, must already be in contact list
      * @throws RemoteException if something goes wrong in the connection
      * @throws InvalidArgumentException if false data was given to the server
      */

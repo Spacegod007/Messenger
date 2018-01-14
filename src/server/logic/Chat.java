@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * A chat where users can talk to each other
  */
-public class Chat
+class Chat
 {
     /**
      * The subscription name of the object clients need to have to get updates
@@ -43,15 +43,15 @@ public class Chat
     private final List<User> participants;
 
     /**
-     * The filestorage where files are stored
+     * The file storage where files are stored
      */
     private final IFileStorage fileStorage;
 
     /**
-     * The contructor of the chat
+     * The constructor of the chat
      * @param self user who created the chat
      * @param other user who is invited to the chat
-     * @throws RemoteException if something goes wrong in the connection to the filestorage
+     * @throws RemoteException if something goes wrong in the connection to the file storage
      */
     Chat(User self, User other) throws RemoteException
     {
@@ -79,7 +79,7 @@ public class Chat
 
     /**
      * Gets the subscription name of the chat
-     * @return
+     * @return a string containing the subscription name of the chat
      */
     public String getChatSubscriptionName()
     {
@@ -87,7 +87,7 @@ public class Chat
     }
 
     /**
-     * Gets a serializable (sendable) version of the chat
+     * Gets a serializable (send able) version of the chat
      * @return a SerializableChat object
      */
     public SerializableChat getAsSerializable()
@@ -98,9 +98,8 @@ public class Chat
     /**
      * Sends a message in this chat
      * @param message to be send
-     * @throws RemoteException if something goes wrong in the connection to the file storage (should the message contain a file)
      */
-    public void sendMessage(Message message) throws RemoteException
+    public void sendMessage(Message message)
     {
         if (message instanceof FileMessage)
         {
@@ -113,7 +112,7 @@ public class Chat
     }
 
     /**
-     * Gets the specified file of of the filestorage
+     * Gets the specified file of of the file storage
      * @param filename to be retrieved
      * @return a byte array containing the file data
      * @throws FileNotFoundException if the file cannot be found
@@ -125,7 +124,7 @@ public class Chat
     }
 
     /**
-     * Stores a file on the filestorage
+     * Stores a file on the file storage
      * @param fileMessage to be stored
      */
     private void storeFile(FileMessage fileMessage)

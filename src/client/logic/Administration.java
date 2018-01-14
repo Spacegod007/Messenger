@@ -178,6 +178,7 @@ public class Administration extends UnicastRemoteObject implements IRemoteProper
         try
         {
             administration.logout(sessionId);
+            publisher.unsubscribeRemoteListener(this, null);
         }
         catch (RemoteException | InvalidArgumentException e)
         {
@@ -264,7 +265,7 @@ public class Administration extends UnicastRemoteObject implements IRemoteProper
         {
             administration.sendMessage(sessionId, chatId, chatMessage);
         }
-        catch (RemoteException | InvalidArgumentException e)
+        catch (RemoteException | InvalidArgumentException ignored)
         { }
     }
 
@@ -385,7 +386,7 @@ public class Administration extends UnicastRemoteObject implements IRemoteProper
     }
 
     /**
-     * Is being called when the chatlist of chats the user participates in has changed on the server
+     * Is being called when the chat list of chats the user participates in has changed on the server
      * @param evt event which is called on a property change
      */
     private void userChatListUpdaterChanged(PropertyChangeEvent evt)
@@ -395,7 +396,7 @@ public class Administration extends UnicastRemoteObject implements IRemoteProper
     }
 
     /**
-     * Is being called when the contactlist of the user has changed on the server
+     * Is being called when the contact list of the user has changed on the server
      * @param evt event which is called on a property change
      */
     private void contactListUpdaterChanged(PropertyChangeEvent evt)

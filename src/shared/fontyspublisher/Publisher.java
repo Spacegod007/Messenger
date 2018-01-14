@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  *
  * @author Frank Peeters, Nico Kuijpers
  */
-public class Publisher {
+class Publisher {
 
     /**
      * Local and remote property listeners subscribed to a property.
@@ -127,11 +127,11 @@ public class Publisher {
     }
 
     /**
-     * Unsubscribe local property listener. Listener will be
-     * unsubscribed from given property. In case given property is the
-     * null-string, the listener will be unsubscribed from all properties.
+     * Unsubscribe local property listener. Listener will
+     * unsubscribe from given property. In case given property is the
+     * null-string, the listener will unsubscribe from all properties.
      *
-     * @param listener local property listener to be unsubscribed
+     * @param listener local property listener to unsubscribe
      * @param property null-String allowed
      */
     public void unsubscribeLocalListener(ILocalPropertyListener listener, String property) {
@@ -139,11 +139,11 @@ public class Publisher {
     }
     
     /**
-     * Unsubscribe remote property listener. Listener will be
-     * unsubscribed from given property. In case given property is the
-     * null-string, the listener will be unsubscribed from all properties.
+     * Unsubscribe remote property listener. Listener will
+     * unsubscribe from given property. In case given property is the
+     * null-string, the listener will unsubscribe from all properties.
      *
-     * @param listener remote property listener to be unsubscribed
+     * @param listener remote property listener to unsubscribe
      * @param property null-String allowed
      */
     public void unsubscribeRemoteListener(IRemotePropertyListener listener, String property) {
@@ -160,7 +160,7 @@ public class Publisher {
                 propertyListeners.get(null).remove(listener);
             }
         } else {
-            // Unsubscribe property listener from all propertys
+            // Unsubscribe property listener from all properties
             /*
              * REMARK BY NICO KUIJPERS.
              * Set<String> keyset = propertyListeners.keySet();
@@ -336,7 +336,7 @@ public class Publisher {
         // Property change event to be sent to listener
         final PropertyChangeEvent event;
 
-        public InformListenerRunnable(IPropertyListener listener, PropertyChangeEvent event) {
+        InformListenerRunnable(IPropertyListener listener, PropertyChangeEvent event) {
             this.listener = listener;
             this.event = event;
         }

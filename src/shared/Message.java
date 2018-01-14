@@ -29,7 +29,7 @@ public abstract class Message<V> implements Serializable
      * @param contents of the message
      * @param author of the message
      */
-    public Message(V contents, String author)
+    Message(V contents, String author)
     {
         this.author = author;
         this.contents = contents;
@@ -42,7 +42,7 @@ public abstract class Message<V> implements Serializable
      * @param contents of the message
      * @param author of the message
      */
-    public Message(OffsetDateTime timestamp, V contents, String author)
+    Message(OffsetDateTime timestamp, V contents, String author)
     {
         this(contents, author);
         this.timestamp = timestamp;
@@ -52,7 +52,7 @@ public abstract class Message<V> implements Serializable
      * gets the author of the message
      * @return a string containing the author of the message
      */
-    public String getAuthor()
+    String getAuthor()
     {
         return author;
     }
@@ -70,7 +70,7 @@ public abstract class Message<V> implements Serializable
      * gets the date and time the message was created
      * @return an OffsetDateTime object which is when the message was created
      */
-    public OffsetDateTime getTimestamp()
+    OffsetDateTime getTimestamp()
     {
         return timestamp;
     }
