@@ -1,6 +1,5 @@
 package bootstrapper;
 
-import client.logic.Administration;
 import client.view.LoginScreen;
 import javafx.application.Application;
 

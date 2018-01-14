@@ -1,22 +1,20 @@
 package client.logic;
 
 import exceptions.InvalidArgumentException;
-
-import server.logic.Chat;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import server.logic.IAdministration;
 import server.logic.User;
-import shared.Message;
+import shared.ChatMessage;
+import shared.SerializableChat;
 import shared.fontyspublisher.IRemotePropertyListener;
 import shared.fontyspublisher.IRemotePublisherForListener;
 
 import java.beans.PropertyChangeEvent;
-import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Administration extends UnicastRemoteObject implements IRemotePropertyListener
 {
@@ -29,31 +27,32 @@ public class Administration extends UnicastRemoteObject implements IRemoteProper
     private String username;
     private final Object serialiser;
 
-    private List<Long> participatingChatIds;
-    private List<String> participatingChatNames;
-    private Map<String, Long> participatingChats;
-    private Map<Long, List<Message>> participatingChatMessages;
+    private final ObservableList<String> observableContacts;
+    private final ObservableList<String> observableParticipatingChatNames;
 
-    private List<String> contacts;
+    private ObservableList<SerializableChat> participatingChats;
+
+    private ObservableMap<String, SerializableChat> chatByName;
 
     public Administration() throws RemoteException
     {
         super();
 
         serverClient = new ServerClient();
-        participatingChatIds = new ArrayList<>();
-        participatingChatNames = new ArrayList<>();
-        participatingChats = new HashMap<>();
-        contacts = new ArrayList<>();
-        participatingChatMessages = new HashMap<>();
+        chatByName = FXCollections.observableHashMap();
+
         serialiser = new Object();
+
+        participatingChats = FXCollections.observableArrayList();
+        observableParticipatingChatNames = FXCollections.observableArrayList();
+        observableContacts = FXCollections.observableArrayList();
 
         administration = serverClient.getAdministration();
     }
 
-    public List<String> getParticipatingChatNames()
+    public ObservableList<String> getParticipatingChatNames()
     {
-        return participatingChatNames;
+        return observableParticipatingChatNames;
     }
 
     public String getUsername()
@@ -61,14 +60,14 @@ public class Administration extends UnicastRemoteObject implements IRemoteProper
         return username;
     }
 
-    public List<String> getContacts()
+    public ObservableList<String> getContacts()
     {
-        return contacts;
+        return observableContacts;
     }
 
-    public List<Message> getChatMessages(String chatName)
+    public ObservableMap<String, SerializableChat> getChatByName()
     {
-        return participatingChatMessages.get(getChatIdByName(chatName));
+        return chatByName;
     }
 
     public boolean login(String username, String password)
@@ -129,11 +128,7 @@ public class Administration extends UnicastRemoteObject implements IRemoteProper
     {
         try
         {
-            if (administration.addContact(sessionId, contactName))
-            {
-                contacts.add(contactName);
-                return true;
-            }
+            return administration.addContact(sessionId, contactName);
         }
         catch (InvalidArgumentException ignored)
         { }
@@ -146,7 +141,6 @@ public class Administration extends UnicastRemoteObject implements IRemoteProper
         try
         {
             administration.removeContact(sessionId, contactName);
-            contacts.remove(contactName);
         }
         catch (InvalidArgumentException | RemoteException e)
         {
@@ -166,12 +160,19 @@ public class Administration extends UnicastRemoteObject implements IRemoteProper
         }
     }
 
-
-    public void sendMessage(String chatName, Message message)
+    public void sendFile(byte[] file, String filename)
     {
+
+    }
+
+    public void sendMessage(String chatName, String message)
+    {
+        long chatId = chatByName.get(chatName).getChatId();
+        ChatMessage chatMessage = new ChatMessage(message, username);
+
         try
         {
-            administration.sendMessage(sessionId, getChatIdByName(chatName), message);
+            administration.sendMessage(sessionId, chatId, chatMessage);
         }
         catch (RemoteException | InvalidArgumentException e)
         {
@@ -181,82 +182,53 @@ public class Administration extends UnicastRemoteObject implements IRemoteProper
 
     public byte[] getFile(String chatName, String filename)
     {
-        try
-        {
-            return administration.getFile(sessionId, getChatIdByName(chatName), filename);
-        }
-        catch (RemoteException | FileNotFoundException | InvalidArgumentException e)
-        {
-            e.printStackTrace();
-        }
-
         return null;
     }
 
     private void chatMessagePropertyNameChanged(PropertyChangeEvent evt)
     {
-        long chatId = (long) evt.getNewValue();
-        try
-        {
-            participatingChatMessages.replace(chatId, administration.getChatMessages(sessionId, chatId));
-        }
-        catch (InvalidArgumentException | RemoteException e)
-        {
-            e.printStackTrace();
-        }
-    }
 
-    private void userChatListUpdaterChanged(PropertyChangeEvent evt)
-    {
-        try
-        {
-            List<Long> chatIds = (List<Long>) evt.getNewValue();
-            getAllChatData(chatIds);
-        }
-        catch (InvalidArgumentException | RemoteException e)
-        {
-            e.printStackTrace();
-        }
     }
 
     private void getUserData() throws RemoteException, InvalidArgumentException
     {
-        participatingChatIds = administration.getParticipatingChats(sessionId);
-        getAllChatData(participatingChatIds);
-        subscribeAllProperties(participatingChatIds);
-        contacts = administration.getContacts(sessionId);
+//        participatingChatIds = administration.getParticipatingChats(sessionId);
+        getAllChatData(administration.getParticipatingChats(sessionId));
+        observableContacts.addAll(administration.getContacts(sessionId));
+
+        subscribeAllProperties();
     }
 
-    private void getAllChatData(List<Long> chatIds) throws RemoteException, InvalidArgumentException
+    private void getAllChatData(List<SerializableChat> participatingChats)
     {
-        participatingChats.clear(); //mapping of key:String by value:Long (chatName, chatId)
-        participatingChatNames.clear();
-        participatingChatMessages.clear();
+        this.participatingChats.clear();
+        this.participatingChats.addAll(participatingChats);
 
-        for (Long chatId : chatIds)
+        chatByName.clear();
+        observableParticipatingChatNames.clear();
+
+        for (SerializableChat chat : participatingChats)
         {
-            String chatName = administration.getChatName(sessionId, chatId);
-            participatingChatNames.add(chatName);
-            participatingChats.put(chatName, chatId);
-            participatingChatMessages.put(chatId, administration.getChatMessages(sessionId, chatId));
+            String chatName = chat.getName(username);
+            observableParticipatingChatNames.add(chatName);
+            chatByName.put(chatName, chat);
         }
     }
 
-    private long getChatIdByName(String chatName)
+    public SerializableChat getChatByName(String chatName)
     {
-        return participatingChats.get(chatName);
+        return chatByName.get(chatName);
     }
 
-    private void subscribeAllProperties(List<Long> participatingChatIds) throws RemoteException
+    private void subscribeAllProperties() throws RemoteException
     {
         subscribeProperty(User.REGISTRY_UPDATER);
+        subscribeProperty(User.CONTACT_LIST_UPDATER);
         subscribeProperty(User.CHAT_LIST_UPDATER);
-        subscribeProperty(User.REMOVED_PROPERTY_KEYWORD);
 
-        for (Long chatId : participatingChatIds)
+        for (SerializableChat chat : participatingChats)
         {
-            subscribeProperty(chatId + Chat.MESSAGES_PROPERTY_NAME);
-            subscribeProperty(chatId + Chat.PARTICIPANTS_CHECKER);
+            subscribeProperty(chat.getChatSubscriptionName());
         }
     }
 
@@ -271,8 +243,10 @@ public class Administration extends UnicastRemoteObject implements IRemoteProper
         switch (evt.getPropertyName())
         {
             case User.REGISTRY_UPDATER:
+                registryUpdaterChanged(evt);
                 return;
-            case User.REMOVED_PROPERTY_KEYWORD:
+            case User.CONTACT_LIST_UPDATER:
+                contactListUpdaterChanged(evt);
                 return;
             case User.CHAT_LIST_UPDATER:
                 userChatListUpdaterChanged(evt);
@@ -281,25 +255,49 @@ public class Administration extends UnicastRemoteObject implements IRemoteProper
                 break;
         }
 
-        for (Long chatId : participatingChatIds)
+        for (SerializableChat chat : participatingChats)
         {
-            if (evt.getPropertyName().equals(chatId + Chat.MESSAGES_PROPERTY_NAME))
+            if (evt.getPropertyName().equals(chat.getChatSubscriptionName()))
             {
-
-                return;
-            }
-            if (evt.getPropertyName().equals(chatId + Chat.PARTICIPANTS_CHECKER))
-            {
-
+                chatMessagesChanged(chat, evt);
                 return;
             }
         }
+    }
 
+    private void chatMessagesChanged(SerializableChat chat, PropertyChangeEvent evt)
+    {
+        SerializableChat newValue = (SerializableChat) evt.getNewValue();
+
+        for (int i = 0; i < participatingChats.size(); i++)
+        {
+            if (chat.getChatId() == participatingChats.get(i).getChatId())
+            {
+                participatingChats.set(i, newValue);
+                chatByName.replace(chat.getName(username), newValue);
+            }
+        }
+    }
+
+    private void userChatListUpdaterChanged(PropertyChangeEvent evt)
+    {
+        observableParticipatingChatNames.clear();
+        getAllChatData((List<SerializableChat>) evt.getNewValue());
+    }
+
+    private void contactListUpdaterChanged(PropertyChangeEvent evt)
+    {
+        observableContacts.clear();
+        observableContacts.addAll((List<String>) evt.getNewValue());
+    }
+    
+    private void registryUpdaterChanged(PropertyChangeEvent evt)
+    {
         try
         {
-            throw new Exception(String.format("You forgot to subscribe to %s idiot", evt.getPropertyName()));
+            publisher.subscribeRemoteListener(this, (String) evt.getNewValue());
         }
-        catch (Exception e)
+        catch (RemoteException e)
         {
             e.printStackTrace();
         }

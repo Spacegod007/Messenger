@@ -18,6 +18,7 @@ public class AddContactScreen
 
     private final Stage primaryStage;
     private final Scene previousScene;
+
     private GridPane gridPane;
 
     private Label resultText;
@@ -26,7 +27,7 @@ public class AddContactScreen
     private Button okButton;
     private Button cancelButton;
 
-    public AddContactScreen(Stage primaryStage, Administration administration)
+    AddContactScreen(Stage primaryStage, Administration administration)
     {
         this.primaryStage = primaryStage;
         previousScene = primaryStage.getScene();

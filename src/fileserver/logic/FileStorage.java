@@ -13,9 +13,13 @@ public class FileStorage extends UnicastRemoteObject implements IFileStorage
 {
     private static final String PATH_PREFIX = "StoredFiles\\";
 
+    private final Object synchronizer;
+
     public FileStorage() throws RemoteException
     {
         super();
+
+        synchronizer = new Object();
     }
 
     @Override
@@ -23,7 +27,10 @@ public class FileStorage extends UnicastRemoteObject implements IFileStorage
     {
         try
         {
-            return readAllData(new File(PATH_PREFIX + filename));
+            synchronized (synchronizer)
+            {
+                return readAllData(new File(PATH_PREFIX + filename));
+            }
         }
         catch (FileNotFoundException e)
         {
@@ -40,7 +47,10 @@ public class FileStorage extends UnicastRemoteObject implements IFileStorage
     @Override
     public void storeData(String filename, byte[] data)
     {
-        writeAllData(new File(PATH_PREFIX + filename), data);
+        synchronized (synchronizer)
+        {
+            writeAllData(new File(PATH_PREFIX + filename), data);
+        }
     }
 
     private byte[] readAllData(File file) throws IOException
@@ -52,6 +62,7 @@ public class FileStorage extends UnicastRemoteObject implements IFileStorage
     {
         try (FileOutputStream fileOutputStream = new FileOutputStream(file, false))
         {
+            //noinspection ResultOfMethodCallIgnored
             file.getParentFile().mkdirs();
             fileOutputStream.write(data);
         }

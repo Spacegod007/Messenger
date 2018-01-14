@@ -8,7 +8,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-public class ErrorScreen
+class ErrorScreen
 {
     private final Stage primaryStage;
     private final Scene previousScene;

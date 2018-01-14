@@ -1,29 +1,28 @@
 package shared;
 
-import server.logic.User;
-
+import java.io.Serializable;
 import java.time.OffsetDateTime;
 
-public abstract class Message<V>
+public abstract class Message<V> implements Serializable
 {
-    private final User author;
+    private final String author;
     private final V contents;
     private OffsetDateTime timestamp;
 
-    public Message(V contents, User author)
+    public Message(V contents, String author)
     {
         this.author = author;
         this.contents = contents;
         this.timestamp = OffsetDateTime.now();
     }
 
-    public Message(OffsetDateTime timestamp, V contents, User author)
+    public Message(OffsetDateTime timestamp, V contents, String author)
     {
         this(contents, author);
         this.timestamp = timestamp;
     }
 
-    public User getAuthor()
+    public String getAuthor()
     {
         return author;
     }
@@ -41,7 +40,6 @@ public abstract class Message<V>
     @Override
     public String toString()
     {
-        return author.getUsername() + " " + timestamp.toLocalDateTime().toString() + String.format("%n") +
-                contents.toString();
+        return "(" + timestamp.getHour() + ":" + timestamp.getMinute() + ") " + author + String.format(": %n") + contents.toString();
     }
 }

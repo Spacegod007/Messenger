@@ -1,12 +1,11 @@
 package server.logic;
 
 import exceptions.InvalidArgumentException;
-import shared.fontyspublisher.IRemotePropertyListener;
+import shared.SerializableChat;
 import shared.fontyspublisher.RemotePublisher;
 import bootstrapper.ServerProgram;
 import shared.Message;
 import shared.fontyspublisher.IRemotePublisherForDomain;
-import shared.fontyspublisher.RemotePublisher;
 
 import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
@@ -17,7 +16,7 @@ public class User implements IRemotePublisherForDomain
 {
     public static final String CHAT_LIST_UPDATER = "chatListUpdater";
     public static final String REGISTRY_UPDATER = "registryUpdater";
-    public static final String REMOVED_PROPERTY_KEYWORD = "removed";
+    public static final String CONTACT_LIST_UPDATER = "contactListUpdater";
 
     private final String username;
     private final String password;
@@ -37,9 +36,9 @@ public class User implements IRemotePublisherForDomain
         chats = new ArrayList<>();
 
         publisher = new RemotePublisher();
-        publisher.registerProperty(CHAT_LIST_UPDATER);
         publisher.registerProperty(REGISTRY_UPDATER);
-        publisher.registerProperty(REMOVED_PROPERTY_KEYWORD);
+        publisher.registerProperty(CHAT_LIST_UPDATER);
+        publisher.registerProperty(CONTACT_LIST_UPDATER);
 
         serverProgram.registerProperty(username, publisher);
     }
@@ -66,7 +65,7 @@ public class User implements IRemotePublisherForDomain
         return contactNames;
     }
 
-    boolean login(String password, long newSessionId) throws RemoteException
+    boolean login(String password, long newSessionId)
     {
         if (this.password.equals(password))
         {
@@ -77,21 +76,26 @@ public class User implements IRemotePublisherForDomain
         return false;
     }
 
-    void logout() throws RemoteException
+    void logout()
     {
         sessionId = -1;
     }
 
-    boolean addContact(User contact)
+    boolean addContact(User contact) throws RemoteException
     {
         if (!username.equals(contact.username))
         {
-            return !contacts.contains(contact) && contacts.add(contact);
+            if (!contacts.contains(contact) && contacts.add(contact))
+            {
+                inform(CONTACT_LIST_UPDATER, null, getContacts());
+                return true;
+            }
         }
         else
         {
             throw new IllegalArgumentException("You can't add yourself as a contact");
         }
+        return false;
     }
 
     void removeContact(String contactName)
@@ -107,7 +111,7 @@ public class User implements IRemotePublisherForDomain
 
     void newChat(String contactName) throws RemoteException, InvalidArgumentException
     {
-        addToChat(new Chat(this, getContactByName(contactName)));
+        new Chat(this, getContactByName(contactName));
     }
 
     void sendMessage(long chatId, Message message) throws RemoteException, InvalidArgumentException
@@ -115,21 +119,16 @@ public class User implements IRemotePublisherForDomain
         getChatById(chatId).sendMessage(message);
     }
 
-    List<Message> getChatMessages(long chatId) throws InvalidArgumentException
+    List<SerializableChat> getParticipatingChats()
     {
-        return getChatById(chatId).getMessages();
-    }
-
-    List<Long> getParticipatingChats()
-    {
-        List<Long> chatIds = new ArrayList<>();
+        List<SerializableChat> returnable = new ArrayList<>();
 
         for (Chat chat : chats)
         {
-            chatIds.add(chat.getChatId());
+            returnable.add(chat.getAsSerializable());
         }
 
-        return chatIds;
+        return returnable;
     }
 
     byte[] getFile(long chatId, String filename) throws InvalidArgumentException, FileNotFoundException, RemoteException
@@ -141,11 +140,11 @@ public class User implements IRemotePublisherForDomain
     {
         chats.add(chat);
 
-        publisher.registerProperty(String.valueOf(chat.getChatId()) + Chat.PARTICIPANTS_CHECKER);
-        publisher.registerProperty(String.valueOf(chat.getChatId()) + Chat.MESSAGES_PROPERTY_NAME);
+        registerProperty(chat.getChatSubscriptionName());
 
-        publisher.inform(REGISTRY_UPDATER, null, chat.getChatId());
-        publisher.inform(CHAT_LIST_UPDATER, null, chat.getChatName(username));
+        inform(REGISTRY_UPDATER, null, chat.getChatSubscriptionName());
+
+        inform(CHAT_LIST_UPDATER, null, getParticipatingChats());
     }
 
     private User getContactByName(String contactName) throws InvalidArgumentException
@@ -174,11 +173,6 @@ public class User implements IRemotePublisherForDomain
         throw new InvalidArgumentException("Chat not found");
     }
 
-    public String getChatName(long chatId) throws InvalidArgumentException
-    {
-        return getChatById(chatId).getChatName(username);
-    }
-
     @Override
     public void registerProperty(String property) throws RemoteException
     {
@@ -190,7 +184,6 @@ public class User implements IRemotePublisherForDomain
     public void unregisterProperty(String property) throws RemoteException
     {
         publisher.unregisterProperty(property);
-        publisher.inform(REGISTRY_UPDATER, null, REMOVED_PROPERTY_KEYWORD + property);
     }
 
     @Override

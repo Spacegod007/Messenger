@@ -1,22 +1,25 @@
 package client.view;
 
 import client.logic.Administration;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-public class MainScreen
+import java.util.ArrayList;
+import java.util.List;
+
+class MainScreen
 {
     private final Administration administration;
     private final Stage primaryStage;
+    private final List<ChatScreen> chatScreens;
     private final Scene loginScene;
     private GridPane gridPane;
 
@@ -32,17 +35,14 @@ public class MainScreen
     {
         this.primaryStage = primaryStage;
         this.administration = administration;
+
         loginScene = primaryStage.getScene();
 
-        getRequiredData();
+        chatScreens = new ArrayList<>();
+
         initializeViewObjects();
 
         primaryStage.setScene(ViewToolbox.buildSceneFromGridPane(gridPane));
-    }
-
-    private void getRequiredData()
-    {
-
     }
 
     private void initializeViewObjects()
@@ -52,14 +52,16 @@ public class MainScreen
         chatListViewText = new Label("Chats");
 
         chatListView = new ListView<>();
-        updateChatList(FXCollections.observableArrayList(administration.getParticipatingChatNames()));
+        chatListView.setItems(administration.getParticipatingChatNames());
+        administration.getParticipatingChatNames().addListener((ListChangeListener<String>) c -> chatListView.setItems(administration.getParticipatingChatNames()));
         chatListView.setOnMouseClicked(this::openChat);
 
         contactsListViewText = new Label("Contacts");
 
         contactsListView = new ListView<>();
-        updateContactList(FXCollections.observableArrayList(administration.getContacts()));
-        contactsListViewText.setOnMouseClicked(this::newChat);
+        contactsListView.setItems(administration.getContacts());
+        administration.getContacts().addListener((ListChangeListener<String>) c -> contactsListView.setItems(administration.getContacts()));
+        contactsListView.setOnMouseClicked(this::newChat);
 
         logoutButton = new Button("Logout");
         logoutButton.setOnAction(this::logout);
@@ -77,9 +79,25 @@ public class MainScreen
 
     private void newChat(MouseEvent event)
     {
-        if (event.getClickCount() == 2)
+        if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2)
         {
-            administration.newChat(contactsListView.getSelectionModel().getSelectedItem());
+            String selectedItem = contactsListView.getSelectionModel().getSelectedItem();
+
+            if (selectedItem != null)
+            {
+                administration.newChat(selectedItem);
+
+                try
+                {
+                    Thread.sleep(50);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+
+                chatScreens.add(new ChatScreen(new Stage(), administration, selectedItem));
+            }
         }
     }
 
@@ -87,23 +105,20 @@ public class MainScreen
     {
         if (event.getClickCount() == 2)
         {
-//            new ChatScreen(this, administration, administration.getChatMessages(chatListView.getSelectionModel().getSelectedItem()));
+            String selectedItem = chatListView.getSelectionModel().getSelectedItem();
+
+            if (selectedItem != null)
+            {
+                chatScreens.add(new ChatScreen(new Stage(), administration, selectedItem));
+            }
         }
-    }
-
-    private void updateChatList(ObservableList<String> chatNames)
-    {
-        Platform.runLater(() -> chatListView.setItems(chatNames));
-    }
-
-    private void updateContactList(ObservableList<String> contactnames)
-    {
-        Platform.runLater(() -> contactsListView.setItems(contactnames));
     }
 
     private void logout(ActionEvent event)
     {
         administration.logout();
+        chatScreens.forEach(ChatScreen::close);
+        chatScreens.clear();
         primaryStage.setScene(loginScene);
     }
 

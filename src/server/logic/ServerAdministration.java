@@ -1,9 +1,9 @@
 package server.logic;
 
-import exceptions.InvalidArgumentException;
-import shared.fontyspublisher.IRemotePropertyListener;
 import bootstrapper.ServerProgram;
+import exceptions.InvalidArgumentException;
 import shared.Message;
+import shared.SerializableChat;
 
 import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
@@ -18,7 +18,7 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
     private AtomicLong nextSessionId;
     private List<User> users;
 
-    private final transient Object synchronizer;
+    private final Object synchronizer;
 
     public ServerAdministration(ServerProgram serverProgram) throws RemoteException
     {
@@ -49,6 +49,16 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
 
         synchronized (synchronizer)
         {
+            try
+            {
+                while (getUserBySessionId(nextSessionId.get()) != null)
+                {
+                    nextSessionId.incrementAndGet();
+                }
+            }
+            catch (InvalidArgumentException ignored)
+            { }
+
             try
             {
                 if (getUserByUsername(username).login(password, nextSessionId.get()))
@@ -89,15 +99,14 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
 
         synchronized (synchronizer)
         {
-            try
+            if (!isExistingUser(username))
             {
-                getUserByUsername(username);
+                users.add(new User(username, password, serverProgram));
+            }
+            else
+            {
                 return -1;
             }
-            catch (InvalidArgumentException ignored)
-            { }
-
-            users.add(new User(username, password, serverProgram));
         }
 
         return login(username, password);
@@ -110,9 +119,9 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
     }
 
     @Override
-    public boolean addContact(long sessionId, String contactName) throws InvalidArgumentException
+    public boolean addContact(long sessionId, String contactName) throws InvalidArgumentException, RemoteException
     {
-        return getUserBySessionId(sessionId).addContact(getUserByUsername(contactName));
+        return isExistingUser(contactName) && getUserBySessionId(sessionId).addContact(getUserByUsername(contactName));
     }
 
     @Override
@@ -134,21 +143,9 @@ public class ServerAdministration extends UnicastRemoteObject implements IAdmini
     }
 
     @Override
-    public List<Message> getChatMessages(long sessionId, long chatId) throws InvalidArgumentException
-    {
-        return getUserBySessionId(sessionId).getChatMessages(chatId);
-    }
-
-    @Override
-    public List<Long> getParticipatingChats(long sessionId) throws InvalidArgumentException
+    public List<SerializableChat> getParticipatingChats(long sessionId) throws InvalidArgumentException
     {
         return getUserBySessionId(sessionId).getParticipatingChats();
-    }
-
-    @Override
-    public String getChatName(long sessionId, long chatId) throws RemoteException, InvalidArgumentException
-    {
-        return getUserBySessionId(sessionId).getChatName(chatId);
     }
 
     @Override

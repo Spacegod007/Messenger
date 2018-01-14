@@ -2,18 +2,16 @@ package client.logic;
 
 import bootstrapper.ServerProgram;
 import server.logic.IAdministration;
-import shared.fontyspublisher.IRemotePropertyListener;
 import shared.fontyspublisher.IRemotePublisherForListener;
 
-import java.beans.PropertyChangeEvent;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-class ServerClient implements IRemotePropertyListener
+class ServerClient
 {
-    String ipAddress = "localhost";
+    final String ipAddress = "localhost";
     private IAdministration administration;
     private IRemotePublisherForListener clientPublisher;
     private Registry registry;
@@ -63,11 +61,5 @@ class ServerClient implements IRemotePropertyListener
         }
 
         return clientPublisher;
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) throws RemoteException
-    {
-
     }
 }

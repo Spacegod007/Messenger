@@ -7,6 +7,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -15,32 +16,18 @@ import java.rmi.RemoteException;
 
 public class LoginScreen extends Application
 {
-    private Administration administration;
-
     private Stage primaryStage;
     private GridPane gridPane;
 
     private Label usernameText;
     private TextField usernameField;
     private Label passwordText;
-    private TextField passwordField;
+    private PasswordField passwordField;
     private Button registerButton;
     private Button loginButton;
 
-    public LoginScreen()
-    {
-        try
-        {
-            administration = new Administration();
-        }
-        catch (RemoteException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
     @Override
-    public void start(Stage primaryStage) throws Exception
+    public void start(Stage primaryStage)
     {
         this.primaryStage = primaryStage;
 
@@ -63,7 +50,8 @@ public class LoginScreen extends Application
 
         passwordText = new Label("Password");
 
-        passwordField = new TextField();
+
+        passwordField = new PasswordField();
 
         registerButton = new Button("Register");
         registerButton.setOnAction(event -> register()
@@ -85,16 +73,24 @@ public class LoginScreen extends Application
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        if (administration.login(username, password))
+        try
         {
-            new MainScreen(primaryStage, administration);
-        }
-        else
-        {
+            Administration administration = new Administration();
 
+            if (administration.login(username, password))
+            {
+                new MainScreen(primaryStage, administration);
+            }
+        }
+        catch (IllegalArgumentException ignored)
+        { }
+        catch (RemoteException ignored)
+        {
+            new ErrorScreen(primaryStage, "Something went wrong in connecting to the server");
         }
 
         resetTextFields();
+
     }
 
     private void register()
@@ -104,6 +100,8 @@ public class LoginScreen extends Application
 
         try
         {
+            Administration administration = new Administration();
+
             if (administration.register(username, password))
             {
                 new MainScreen(primaryStage, administration);
@@ -111,6 +109,10 @@ public class LoginScreen extends Application
         }
         catch (InvalidArgumentException | IllegalArgumentException ignored)
         { }
+        catch (RemoteException ignored)
+        {
+            new ErrorScreen(primaryStage, "Something went wrong in connecting to the server");
+        }
 
         resetTextFields();
     }

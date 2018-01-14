@@ -1,20 +1,19 @@
 package shared;
 
-import server.logic.User;
-
+import java.io.Serializable;
 import java.time.OffsetDateTime;
 
-public class FileMessage extends Message<byte[]>
+public class FileMessage extends Message<byte[]> implements Serializable
 {
     private final String filename;
 
-    public FileMessage(byte[] contents, String filename, User author)
+    public FileMessage(byte[] contents, String filename, String author)
     {
         super(contents, author);
         this.filename = filename;
     }
 
-    public FileMessage(OffsetDateTime timestamp, byte[] contents, String filename, User author)
+    public FileMessage(OffsetDateTime timestamp, byte[] contents, String filename, String author)
     {
         super(timestamp, contents, author);
         this.filename = filename;
@@ -28,7 +27,7 @@ public class FileMessage extends Message<byte[]>
     @Override
     public String toString()
     {
-        return getAuthor().getUsername() + " " + getTimestamp().toLocalDateTime().toString() + String.format("%n") +
+        return getAuthor() + " " + getTimestamp().toLocalDateTime().toString() + String.format("%n") +
                 "Send: " + filename;
     }
 }
