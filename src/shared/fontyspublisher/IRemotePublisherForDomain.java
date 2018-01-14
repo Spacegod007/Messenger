@@ -27,7 +27,7 @@ public interface IRemotePublisherForDomain extends Remote {
      * property was already registered. 
      *
      * @param property empty string not allowed
-     * @throws RemoteException
+     * @throws RemoteException if something went wrong in the connection
      */
     void registerProperty(String property) throws RemoteException;
     
@@ -38,7 +38,7 @@ public interface IRemotePublisherForDomain extends Remote {
      * be unregistered.
      *
      * @param property registered property at this publisher
-     * @throws RemoteException
+     * @throws RemoteException if something went wrong in the connection
      */
     void unregisterProperty(String property) throws RemoteException;
     
@@ -52,7 +52,7 @@ public interface IRemotePublisherForDomain extends Remote {
      * @param property property is either null-String or is registered
      * @param oldValue original value of property at domain (null is allowed)
      * @param newValue new value of property at domain
-     * @throws RemoteException
+     * @throws RemoteException if something went wrong in the connection
      */
     void inform(String property, Object oldValue, Object newValue)
             throws RemoteException;
@@ -62,7 +62,7 @@ public interface IRemotePublisherForDomain extends Remote {
      * including the null property is returned.
      *
      * @return list of registered properties including null
-     * @throws RemoteException
+     * @throws RemoteException if something went wrong in the connection
      */
     List<String> getProperties() throws RemoteException;
 }

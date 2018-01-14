@@ -62,7 +62,7 @@ class Publisher {
      * Constructor for Publisher. Property listeners may subscribe to given
      * properties.
      *
-     * @param properties
+     * @param properties used to start the publisher
      */
     public Publisher(String[] properties) {
         

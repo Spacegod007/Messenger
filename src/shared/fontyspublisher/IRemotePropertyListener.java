@@ -19,7 +19,7 @@ public interface IRemotePropertyListener extends IPropertyListener, Remote  {
      * 
      * 
      * @param evt PropertyChangeEvent @see java.beans.PropertyChangeEvent
-     * @throws RemoteException
+     * @throws RemoteException if something went wrong in the connection
      */
     void propertyChange(PropertyChangeEvent evt) throws RemoteException;
 }

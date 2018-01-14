@@ -26,7 +26,7 @@ public interface IRemotePublisherForListener extends Remote {
      *
      * @param listener remote property listener to be subscribed
      * @param property null-String allowed
-     * @throws RemoteException
+     * @throws RemoteException if something went wrong in the connection
      */
     void subscribeRemoteListener(IRemotePropertyListener listener, String property)
             throws RemoteException;
@@ -38,7 +38,7 @@ public interface IRemotePublisherForListener extends Remote {
      * 
      * @param listener property listener to be unsubscribed
      * @param property null-String allowed
-     * @throws RemoteException
+     * @throws RemoteException if something went wrong in the connection
      */
     void unsubscribeRemoteListener(IRemotePropertyListener listener, String property)
             throws RemoteException;
