@@ -70,6 +70,16 @@ public class User implements IRemotePublisherForDomain
      */
     User(String username, String password, ServerProgram serverProgram) throws RemoteException
     {
+        if (username == null || username.isEmpty())
+        {
+            throw new IllegalArgumentException("Username can't be empty");
+        }
+
+        if (password == null || password.isEmpty())
+        {
+            throw new IllegalArgumentException("Password can't be empty");
+        }
+
         this.username = username;
         this.password = password;
 
@@ -151,6 +161,11 @@ public class User implements IRemotePublisherForDomain
      */
     boolean addContact(User contact) throws RemoteException
     {
+        if (contact == null)
+        {
+            throw new IllegalArgumentException("contact cannot be null");
+        }
+
         if (!username.equals(contact.username))
         {
             if (!contacts.contains(contact) && contacts.add(contact))

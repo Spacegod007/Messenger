@@ -6,7 +6,7 @@ import javafx.application.Application;
 /**
  * Main entry point of the client application
  */
-class ClientProgram
+public class ClientProgram
 {
     /**
      * a private constructor to prevent initialisation of the class
