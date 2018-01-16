@@ -16,6 +16,8 @@ public class ChatMessage extends Message<String> implements Serializable
     public ChatMessage(String contents, String author)
     {
         super(contents, author);
+
+        checkContentsAsString(contents);
     }
 
     /**
@@ -27,5 +29,15 @@ public class ChatMessage extends Message<String> implements Serializable
     public ChatMessage(OffsetDateTime timestamp, String contents, String author)
     {
         super(timestamp, contents, author);
+
+        checkContentsAsString(contents);
+    }
+
+    private void checkContentsAsString(String contents)
+    {
+        if (contents == null || contents.isEmpty())
+        {
+            throw new IllegalArgumentException("contents cannot be null or empty");
+        }
     }
 }

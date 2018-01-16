@@ -31,6 +31,8 @@ public abstract class Message<V> implements Serializable
      */
     Message(V contents, String author)
     {
+        authorAndDataCheck(contents, author);
+
         this.author = author;
         this.contents = contents;
         this.timestamp = OffsetDateTime.now();
@@ -45,6 +47,12 @@ public abstract class Message<V> implements Serializable
     Message(OffsetDateTime timestamp, V contents, String author)
     {
         this(contents, author);
+
+        if (timestamp == null)
+        {
+            throw new IllegalArgumentException("a given timestamp should never be null");
+        }
+
         this.timestamp = timestamp;
     }
 
@@ -73,6 +81,24 @@ public abstract class Message<V> implements Serializable
     OffsetDateTime getTimestamp()
     {
         return timestamp;
+    }
+
+    /**
+     * Checks if the author and contents contain a value
+     * @param contents of the message
+     * @param author of the message
+     */
+    private void authorAndDataCheck(V contents, String author)
+    {
+        if (contents == null)
+        {
+            throw new IllegalArgumentException("contents of a message cannot be null");
+        }
+
+        if (author == null || author.isEmpty())
+        {
+            throw new IllegalArgumentException("author of a message cannot be null");
+        }
     }
 
     @Override

@@ -39,7 +39,7 @@ public class ServerProgram
     /**
      * The constructor of the server application
      */
-    private ServerProgram()
+    public ServerProgram()
     {
         ServerAdministration serverAdministration;
 

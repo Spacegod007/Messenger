@@ -22,7 +22,18 @@ public class FileMessage extends Message<byte[]> implements Serializable
     public FileMessage(byte[] contents, String filename, String author)
     {
         super(contents, author);
+
+        checkFilename(filename);
+
         this.filename = filename;
+    }
+
+    private void checkFilename(String filename)
+    {
+        if (filename == null || filename.isEmpty())
+        {
+            throw new IllegalArgumentException("filename cannot be null or empty");
+        }
     }
 
     /**
@@ -35,6 +46,9 @@ public class FileMessage extends Message<byte[]> implements Serializable
     public FileMessage(OffsetDateTime timestamp, byte[] contents, String filename, String author)
     {
         super(timestamp, contents, author);
+
+        checkFilename(filename);
+        
         this.filename = filename;
     }
 

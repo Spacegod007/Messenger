@@ -68,7 +68,7 @@ public class User implements IRemotePublisherForDomain
      * @param serverProgram which is used to register the publisher
      * @throws RemoteException if something goes wrong in the creation of the publisher
      */
-    User(String username, String password, ServerProgram serverProgram) throws RemoteException
+    public User(String username, String password, ServerProgram serverProgram) throws RemoteException
     {
         if (username == null || username.isEmpty())
         {

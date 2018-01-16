@@ -33,12 +33,37 @@ public class SerializableChat implements Serializable
 
     public SerializableChat(long chatId, List<User> participants, List<Message> messages, String chatSubscriptionName)
     {
+        checkValues(chatId, participants, messages, chatSubscriptionName);
+
         this.messages = messages;
         this.chatId = chatId;
         this.chatSubscriptionName = chatSubscriptionName;
 
         this.participants = new ArrayList<>();
         participants.forEach(user -> this.participants.add(user.getUsername()));
+    }
+
+    private void checkValues(long chatId, List<User> participants, List<Message> messages, String chatSubscriptionName)
+    {
+        if (chatId < 0)
+        {
+            throw new IndexOutOfBoundsException("ChatId must be a positive number");
+        }
+
+        if (participants == null || participants.isEmpty() || participants.size() < 2)
+        {
+            throw new IllegalArgumentException("Participants must contain at least 2 users");
+        }
+
+        if (messages == null)
+        {
+            throw new IllegalArgumentException("Messages cannot be null");
+        }
+
+        if (chatSubscriptionName == null || chatSubscriptionName.isEmpty())
+        {
+            throw new IllegalArgumentException("chatSubscriptionName cannot be null or empty");
+        }
     }
 
     /**
