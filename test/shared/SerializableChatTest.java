@@ -163,12 +163,17 @@ public class SerializableChatTest
             Assert.fail("The username of the current user should not appear in the chat name");
         }
 
-        if (!serializableChat.getName(user2.getUsername()).contains(user1.getUsername()))
+        User user3 = new User("user3", "user3Password", serverProgram);
+        serializableChat.getParticipants().add(user3.getUsername());
+
+        String user2ChatName = serializableChat.getName(user2.getUsername());
+
+        if (!user2ChatName.contains(user1.getUsername()) && !user2ChatName.contains(user3.getUsername()))
         {
             Assert.fail("The chat name should show for each user who they are talking to");
         }
 
-        if (serializableChat.getName(user2.getUsername()).contains(user2.getUsername()))
+        if (user2ChatName.contains(user2.getUsername()))
         {
             Assert.fail("The username of the current user should not appear in the chat name");
         }
